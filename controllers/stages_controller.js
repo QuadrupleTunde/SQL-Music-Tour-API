@@ -26,7 +26,7 @@ stages.get('/:name', async (req, res) => {
             include:[{
                 model:Event,
                 as: "event",
-                attributes: {include: ["event_id", "stage_id"]},
+                through:{attributes: []},            
                 where:{
                     name:{[Op.like]: `%${req.query.event ? req.query.event: ''}%`}
                 }
@@ -34,14 +34,15 @@ stages.get('/:name', async (req, res) => {
             {
             model: Set_Times,
             as: "set_times",
-            include:[{
-                model: Event, as: "event"
-            }],
+            include:{
+                model: Event, as: "event",
             where:{
                 name:{[Op.like]: `%${req.query.event ? req.query.event: ''}%`}
             }
             }
-        ]
+        },
+        ],
+        order: [[{model: Event, as: "event"}, 'date', 'DESC']],
 
         })
         res.status(200).json(foundStage)
