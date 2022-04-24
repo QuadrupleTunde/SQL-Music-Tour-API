@@ -27,13 +27,21 @@ bands.get('/:name', async (req, res) => {
             include:[{ 
                 model: Meet_Greets, 
                 as: "meet_greets",
-                include:{ model: Event, as: "event"}
+                include:{ model: Event, as: "event",
+                where: {name: {[Op.like]: `%${req.query.event ? req.query.event: ''}%`}}
+            }
             },
             {
                 model: Set_Times,
                 as: "set_times",
-                include:{model:Event, as:"event"}
-            }]
+                include:{model:Event, as:"event",
+                where: {name: {[Op.like]: `%${req.query.event ? req.query.event: ''}%`}}
+            }
+            }],
+            order:[
+                [{model: Meet_Greets, as: "meet_greets"}, {model: Event, as: "event"}, 'date', 'DESC'],
+                [{model: Set_Times, as: "set_times"}, {model:Event, as: "event"}, 'date', 'DESC']
+            ]
         })
         res.status(200).json(foundBand)
     } catch (error) {
